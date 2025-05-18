@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FISHOP
 {
     public partial class Carrinho : Form
     {
+
         public Carrinho()
         {
             InitializeComponent();
+        }
+
+        private decimal taxaEntrega = 0;
+
+        private void Carrinho_Load(object sender, EventArgs e)
+        {
+            AtualizarCarrinho();
+            PopularEnderecos();
         }
 
         private void back_btn_Click(object sender, EventArgs e)
@@ -22,49 +27,142 @@ namespace FISHOP
             this.Close();
         }
 
-        private void Carrinho_Load(object sender, EventArgs e)
+
+        public void AtualizarCarrinho()
         {
-            try
+            flowLayoutPanel1.Controls.Clear();
+
+            var produtos = CarrinhoService.ObterProdutos();
+
+            if (produtos.Count == 0)
             {
 
-                if (CarrinhoService.ProdutosNoCarrinho.Count == 0)
-                {
-                    flowLayoutPanel1.Controls.Clear();
-                    Label label = new Label
-                    {
-                        Text = "Seu carrinho está vazio",
-                        AutoSize = true,
-                        Font = new Font("Arial", 14, FontStyle.Bold),
-                        ForeColor = Color.Gray,
-                        Location = new Point(50, 50)
-                    };
-                    flowLayoutPanel1.Controls.Add(label);
-                }
+
+                total_lbl.Text = "Total: R$ 0,00";
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Erro ao carregar o carrinho: " + ex.Message);
-                flowLayoutPanel1.Controls.Clear();
-
-            foreach (Item p in CarrinhoService.ProdutosNoCarrinho)
-            {
-                CarrinhoCard card = new CarrinhoCard
+                foreach (var item in produtos)
                 {
-                    Titulo = p.Title,
-                    Preco = p.Price,
-                    Loja = p.Source,
-                    Estrelas = p.Rating,
-                    ImagemUrl = p.ImageUrl
-                };
+                    CarrinhoCard card = new CarrinhoCard
+                    {
+                        Titulo = item.Title,
+                        Preco = "R$ " + item.ValorNumerico.ToString("F2").Replace('.', ','),
+                        Loja = item.Source,
+                        Estrelas = item.Rating,
+                        ImagemUrl = item.ImageUrl,
+                        Produto = item,
+                        Quantidade = item.Quantidade > 0 ? item.Quantidade : 1
+                    };
 
                     card.Dock = DockStyle.Top;
-
-                    Console.WriteLine("Adicionando produto ao carrinho: " + p.Title);
-
                     flowLayoutPanel1.Controls.Add(card);
+                }
+
+                AtualizarTotal();
             }
         }
-        
-    }
-}}
 
+        public void AtualizarTotal()
+        {
+            decimal subtotal = 0;
+
+            foreach (CarrinhoCard card in flowLayoutPanel1.Controls.OfType<CarrinhoCard>())
+            {
+                decimal valorUnitario = card.Produto?.ValorNumerico ?? 0;
+                int quantidade = card.Quantidade;
+                subtotal += valorUnitario * quantidade;
+            }
+
+            decimal total = subtotal + taxaEntrega;
+
+            subtotal_lbl.Text = "Subtotal: R$ " + subtotal.ToString("F2").Replace('.', ',');
+            taxa_lbl.Text = "Taxa de entrega: R$ " + taxaEntrega.ToString("F2").Replace('.', ',');
+            total_lbl.Text = "Total: R$ " + total.ToString("F2").Replace('.', ',');
+        }
+
+        public void PopularEnderecos()
+        {
+            endereco_flow.Controls.Clear();
+
+            var enderecos = EnderecoService.ObterEnderecos();
+
+            if (enderecos.Count == 0)
+            {
+                endereco_panel.Visible = true;
+            }
+            else
+            {
+                endereco_panel.Visible = false;
+
+                foreach (var e in enderecos)
+                {
+                    var card = new EnderecoCard
+                    {
+                        Rua = e.Rua,
+                        Numero = e.Numero,
+                        Bairro = e.Bairro,
+                        Cidade = e.Cidade,
+                        Usuario = e.Usuario,
+                        Width = endereco_flow.ClientSize.Width - 25,
+                        Margin = new Padding(3, 3, 3, 10)
+                    };
+
+                    card.EnderecoSelecionado += EnderecoSelecionadoHandler;
+
+                    endereco_flow.Controls.Add(card);
+                }
+
+
+                var addEnderecoLabel = new Label()
+                {
+                    Text = "Adicionar novo endereço",
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    ForeColor = Color.Black,
+                    Cursor = Cursors.Hand,
+                    Font = new Font("Segoe UI", 10, FontStyle.Underline),
+                    Dock = DockStyle.Top,
+                    Height = 30,
+                    //Margin = new Padding(3, 5, 3, 5)
+                };
+
+                addEnderecoLabel.Click += (s, e) =>
+                {
+                    var cadastro = new EnderecoCadastro(this);
+                    cadastro.ShowDialog();
+                };
+
+                endereco_flow.Controls.Add(addEnderecoLabel);
+            }
+        }
+
+        private void EnderecoSelecionadoHandler(object sender, EventArgs e)
+        {
+
+            foreach (var control in endereco_flow.Controls)
+            {
+                if (control is EnderecoCard card && card != sender)
+                {
+                    card.Desmarcar();
+                }
+            }
+
+
+            Random rnd = new Random();
+            taxaEntrega = rnd.Next(5, 26); // de 5 a 25
+
+
+            taxa_lbl.Text = "Taxa de entrega: R$ " + taxaEntrega.ToString("F2").Replace('.', ',');
+
+            AtualizarTotal();
+        }
+
+
+        private void cadastro_endereco_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            EnderecoCadastro cadastro = new EnderecoCadastro(this);
+            cadastro.ShowDialog();
+        }
+    }
+}

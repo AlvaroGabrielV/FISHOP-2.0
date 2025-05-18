@@ -59,6 +59,7 @@
             minimize_btn = new Guna.UI2.WinForms.Guna2Button();
             close_btn = new Guna.UI2.WinForms.Guna2Button();
             guna2PictureBox2 = new Guna.UI2.WinForms.Guna2PictureBox();
+            cart_quantity = new Guna.UI2.WinForms.Guna2HtmlLabel();
             guna2Panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)guna2PictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)guna2PictureBox2).BeginInit();
@@ -76,14 +77,15 @@
             input_txt.DisabledState.PlaceholderForeColor = Color.FromArgb(138, 138, 138);
             input_txt.FillColor = Color.FromArgb(235, 241, 250);
             input_txt.FocusedState.BorderColor = Color.FromArgb(94, 148, 255);
-            input_txt.Font = new Font("Segoe UI", 9F);
+            input_txt.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             input_txt.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
-            input_txt.Location = new Point(273, 109);
+            input_txt.Location = new Point(238, 89);
+            input_txt.Margin = new Padding(4);
             input_txt.Name = "input_txt";
             input_txt.PlaceholderText = "Pesquisar...";
             input_txt.SelectedText = "";
             input_txt.ShadowDecoration.CustomizableEdges = customizableEdges2;
-            input_txt.Size = new Size(524, 32);
+            input_txt.Size = new Size(598, 41);
             input_txt.TabIndex = 0;
             input_txt.KeyPress += input_txt_KeyPress;
             // 
@@ -101,10 +103,10 @@
             input_btn.ForeColor = Color.White;
             input_btn.Image = Properties.Resources.search__2_;
             input_btn.ImageAlign = HorizontalAlignment.Left;
-            input_btn.Location = new Point(803, 109);
+            input_btn.Location = new Point(843, 89);
             input_btn.Name = "input_btn";
             input_btn.ShadowDecoration.CustomizableEdges = customizableEdges4;
-            input_btn.Size = new Size(105, 32);
+            input_btn.Size = new Size(110, 41);
             input_btn.TabIndex = 1;
             input_btn.Text = "Buscar";
             input_btn.TextAlign = HorizontalAlignment.Right;
@@ -120,7 +122,7 @@
             // 
             // carrinho_btn
             // 
-            carrinho_btn.BorderRadius = 15;
+            carrinho_btn.BorderRadius = 25;
             carrinho_btn.CustomizableEdges = customizableEdges5;
             carrinho_btn.DisabledState.BorderColor = Color.DarkGray;
             carrinho_btn.DisabledState.CustomBorderColor = Color.DarkGray;
@@ -130,14 +132,12 @@
             carrinho_btn.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             carrinho_btn.ForeColor = Color.White;
             carrinho_btn.Image = Properties.Resources.grocery_store;
-            carrinho_btn.ImageAlign = HorizontalAlignment.Left;
             carrinho_btn.ImageSize = new Size(25, 25);
-            carrinho_btn.Location = new Point(1035, 73);
+            carrinho_btn.Location = new Point(1029, 89);
             carrinho_btn.Name = "carrinho_btn";
             carrinho_btn.ShadowDecoration.CustomizableEdges = customizableEdges6;
-            carrinho_btn.Size = new Size(130, 32);
+            carrinho_btn.Size = new Size(55, 43);
             carrinho_btn.TabIndex = 1;
-            carrinho_btn.Text = "Carrinho";
             carrinho_btn.TextAlign = HorizontalAlignment.Right;
             carrinho_btn.Click += carrinho_btn_Click;
             // 
@@ -166,7 +166,7 @@
             profile_btn.HoverState.CustomBorderColor = Color.Transparent;
             profile_btn.HoverState.FillColor = Color.Transparent;
             profile_btn.ImageSize = new Size(50, 50);
-            profile_btn.Location = new Point(1171, 59);
+            profile_btn.Location = new Point(1168, 63);
             profile_btn.Name = "profile_btn";
             profile_btn.PressedColor = Color.Transparent;
             profile_btn.ShadowDecoration.CustomizableEdges = customizableEdges18;
@@ -257,12 +257,26 @@
             guna2PictureBox2.TabIndex = 10;
             guna2PictureBox2.TabStop = false;
             // 
+            // cart_quantity
+            // 
+            cart_quantity.AutoSize = false;
+            cart_quantity.BackColor = Color.Red;
+            cart_quantity.Font = new Font("Arial Black", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            cart_quantity.ForeColor = Color.White;
+            cart_quantity.Location = new Point(1063, 86);
+            cart_quantity.Name = "cart_quantity";
+            cart_quantity.Size = new Size(22, 24);
+            cart_quantity.TabIndex = 0;
+            cart_quantity.Text = "0";
+            cart_quantity.TextAlignment = ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(168, 203, 255);
             ClientSize = new Size(1271, 768);
+            Controls.Add(cart_quantity);
             Controls.Add(flowProdutos);
             Controls.Add(guna2PictureBox2);
             Controls.Add(guna2Panel1);
@@ -295,5 +309,6 @@
         private Guna.UI2.WinForms.Guna2Button minimize_btn;
         private Guna.UI2.WinForms.Guna2PictureBox guna2PictureBox1;
         private Guna.UI2.WinForms.Guna2PictureBox guna2PictureBox2;
+        private Guna.UI2.WinForms.Guna2HtmlLabel cart_quantity;
     }
 }

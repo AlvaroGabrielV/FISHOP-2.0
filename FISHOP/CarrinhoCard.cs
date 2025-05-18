@@ -1,22 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace FISHOP
 {
     public partial class CarrinhoCard : UserControl
     {
+        public Item Produto { get; set; }
+
         public CarrinhoCard()
         {
             InitializeComponent();
+
         }
+
+
+        public int Quantidade
+        {
+            get => (int)quantity_picker.Value;
+            set
+            {
+                if (value < quantity_picker.Minimum)
+                    value = (int)quantity_picker.Minimum;
+                if (value > quantity_picker.Maximum)
+                    value = (int)quantity_picker.Maximum;
+
+                quantity_picker.Value = value;
+
+                if (Produto != null)
+                    Produto.Quantidade = value;
+            }
+        }
+
+        private void quantity_picker_ValueChanged(object sender, EventArgs e)
+        {
+            if (Produto != null)
+            {
+                Produto.Quantidade = Quantidade;
+
+                
+                var formCarrinho = this.FindForm() as Carrinho;
+                formCarrinho?.AtualizarTotal();
+            }
+        }
+
+        private void remover_btn_Click(object sender, EventArgs e)
+        {
+            CarrinhoService.RemoverProduto(Produto);
+            var formCarrinho = this.FindForm() as Carrinho;
+            formCarrinho?.AtualizarCarrinho();
+        }
+        
 
         public string Titulo
         {
@@ -33,7 +68,7 @@ namespace FISHOP
         public string Loja
         {
             get => source_lbl.Text;
-            set { source_lbl.Text = value; }
+            set => source_lbl.Text = value;
         }
 
         public float Estrelas
@@ -41,7 +76,6 @@ namespace FISHOP
             get => rating_stars.Value;
             set => rating_stars.Value = value;
         }
-
 
         public string ImagemUrl
         {
@@ -55,6 +89,7 @@ namespace FISHOP
                         using (var ms = new System.IO.MemoryStream(imgBytes))
                         {
                             image_url.Image = Image.FromStream(ms);
+                            image_url.BackgroundImageLayout = ImageLayout.Zoom;
                         }
                     }
                 }

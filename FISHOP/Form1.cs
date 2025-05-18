@@ -15,20 +15,12 @@ namespace FISHOP
             {
                 List<Item> produtos = GeradorProduto.GerarProdutos(input_txt.Text);
 
-                if (produtos != null)
+                if (produtos != null && produtos.Count > 0)
                 {
                     foreach (var item in produtos)
                     {
-                        ProdutoCard card = new ProdutoCard
-                        {
-                            Titulo = item.Title,
-                            Preco = item.Price,
-                            Loja = item.Source,
-                            Estrelas = item.Rating,
-                            Avaliacoes = item.RatingCount.ToString(),
-                            ImagemUrl = item.ImageUrl
-                        };
-
+                        ProdutoCard card = new ProdutoCard();
+                        card.SetProduto(item);
                         flowProdutos.Controls.Add(card);
                     }
                 }
@@ -56,7 +48,7 @@ namespace FISHOP
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         private void carrinho_btn_Click(object sender, EventArgs e)
@@ -65,6 +57,18 @@ namespace FISHOP
             carrinho.ShowDialog();
 
 
+        }
+
+        public void AtualizarQuantidadeCarrinho()
+        {
+            int total = 0;
+
+            foreach (var item in CarrinhoService.ObterProdutos())
+            {
+                total += item.Quantidade;
+            }
+
+            cart_quantity.Text = total.ToString();
         }
     }
 }
