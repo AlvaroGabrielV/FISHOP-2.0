@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FISHOP": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\rafae\\OneDrive\\Documentos\\Área de Trabalho\\FISHOP-master\\FISHOP\\bin\\Debug\\net8.0-windows"
+    }
+  }
+}
