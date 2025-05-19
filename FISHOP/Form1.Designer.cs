@@ -220,7 +220,7 @@
             minimize_btn.ShadowDecoration.CustomizableEdges = customizableEdges12;
             minimize_btn.Size = new Size(35, 31);
             minimize_btn.TabIndex = 1;
-            minimize_btn.Click += minimize_btn_Click_1;
+
             // 
             // close_btn
             // 

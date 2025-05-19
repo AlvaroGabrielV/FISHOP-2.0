@@ -1,72 +1,118 @@
-﻿using Org.BouncyCastle.Cms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BCrypt.Net;
-using System.Text.RegularExpressions;
+﻿using Atividade_GestaodeProdutos;
 using MySql.Data.MySqlClient;
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 
-namespace Atividade_GestaodeProdutos
+namespace FISHOP
 {
-    class Usuarios
+    public class Usuarios
     {
-        private string email;
-        private string senha;
-        private string usuario;
-        private string nome;
-        private string cpf;
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public string Cpf { get; set; }
+        public string Email { get; set; }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public string Usuario
-        {
-            get { return usuario; }
-            set { usuario = value; }
-        }
-        public string Nome
-        {
-            get { return nome; }
-            set { nome = value ; }
-        }
-        public string Senha
-        {
-            get { return senha; }
-            set { senha = value; }
+        // Neste projeto, a coluna no banco chama-se “usuario”
+        public string UsuarioLogin { get; set; }
 
-             
-        }
-        public string Email
+        // A coluna no banco chama-se apenas “senha”
+        public string Senha { get; set; }
+
+        public static Usuarios ObterPorLoginOuEmail(string loginOuEmail)
         {
-            get { return email; }
-            set
+            using (var conn = new ConexaoBD().Conectar())
             {
-                if (!verificarEmail(value))
-                    throw new Exception("Email inválido.");
-                email = value;
+                string sql = @"
+                    SELECT id, nome, cpf, email, usuario, senha
+                    FROM usuarios
+                    WHERE usuario = @loginOuEmail
+                       OR email = @loginOuEmail
+                    LIMIT 1;
+                ";
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@loginOuEmail", loginOuEmail);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            return null;
+
+                        return new Usuarios
+                        {
+                            Id = reader.GetInt32("id"),
+                            Nome = reader.GetString("nome"),
+                            Cpf = reader.GetString("cpf"),
+                            Email = reader.GetString("email"),
+                            UsuarioLogin = reader.GetString("usuario"),
+                            Senha = reader.GetString("senha")
+                        };
+                    }
+                }
             }
         }
-    
-        public string Cpf
+
+        public bool VerificarSenha(string senhaDigitada)
         {
-            get { return cpf;  }
-            set { cpf = value; }    
+            if (string.IsNullOrEmpty(Senha))
+                return false;
+
+            string hashDigitado = GerarSha256(senhaDigitada);
+            return hashDigitado == Senha;
         }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static bool verificarEmail(string email)
+        public bool RedefinirSenha(string novaSenha)
         {
-            string emailValido = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            Regex regex = new Regex(emailValido);
-            return regex.IsMatch(email);
+            
+            string novoHash = GerarSha256(novaSenha);
+
+            using (var conn = new ConexaoBD().Conectar())
+            {
+                string sql = @"
+                    UPDATE usuarios
+                    SET senha = @novoHash
+                    WHERE id = @id;
+                ";
+
+                using (var cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@novoHash", novoHash);
+                    cmd.Parameters.AddWithValue("@id", Id);
+
+                    int afetados = cmd.ExecuteNonQuery();
+                    if (afetados > 0)
+                    {
+                        Senha = novoHash;
+                        return true;
+                    }
+                    return false;
+                }
+            }
         }
-//----------------------------------------------------------------------------------------------------------------------------------//
+
+        public static string GerarSha256(string text)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(text));
+                var sb = new StringBuilder();
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
+        }
+
         public bool ValidarCPF(string cpf)
         {
-            cpf = new string(cpf.Where(char.IsDigit).ToArray());
+            if (string.IsNullOrEmpty(cpf)) return false;
 
-            if (cpf.Length != 11 || cpf.Distinct().Count() == 1)
-                return false;
+            cpf = Regex.Replace(cpf, "[^0-9]", "");
+
+            if (cpf.Length != 11) return false;
+            if (new string(cpf[0], 11) == cpf) return false;
 
             int[] multiplicador1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] multiplicador2 = { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
@@ -78,149 +124,20 @@ namespace Atividade_GestaodeProdutos
                 soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
 
             int resto = soma % 11;
-            int digito1 = resto < 2 ? 0 : 11 - resto;
+            resto = (resto < 2) ? 0 : 11 - resto;
 
-            tempCpf += digito1;
+            string digito = resto.ToString();
+            tempCpf += digito;
             soma = 0;
 
             for (int i = 0; i < 10; i++)
                 soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
 
             resto = soma % 11;
-            int digito2 = resto < 2 ? 0 : 11 - resto;
+            resto = (resto < 2) ? 0 : 11 - resto;
+            digito += resto.ToString();
 
-            string cpfVerificado = tempCpf + digito2;
-            return cpf == cpfVerificado;
-        }
-//----------------------------------------------------------------------------------------------------------------------------------//
-        
-        public bool CadastrarUsuario()
-        {
-            try
-            {
-                using(MySqlConnection conexaoBanco = new ConexaoBD().Conectar())
-                {
-                    string inserir = "INSERT INTO usuarios (nome, cpf, email, senha, usuario) values (@nome, @cpf, @email, @senha, @usuario)";
-
-                    MySqlCommand comando = new MySqlCommand(inserir, conexaoBanco);
-
-                    comando.Parameters.AddWithValue("@nome", Nome);
-                    comando.Parameters.AddWithValue("@cpf", Cpf);
-                    comando.Parameters.AddWithValue("@email", Email);
-                    comando.Parameters.AddWithValue("@senha", Senha);
-                    comando.Parameters.AddWithValue("@usuario", Usuario);
-
-                    int resultado = comando.ExecuteNonQuery();
-                    
-                    if(resultado > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao cadastrar usuário - Método -> " + ex.Message, "Erro - Cadastrar usuário", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        //----------------------------------------------------------------------------------------------------------------------------------//
-        public bool RedefinirSenha(string email, string novaSenha)
-        {
-            try
-            {
-                string senhaHash = BCrypt.Net.BCrypt.HashPassword(novaSenha);
-
-                using (MySqlConnection conexaoBanco = new ConexaoBD().Conectar())
-                {
-                    string update = "UPDATE usuarios SET senha = @senha WHERE email = @email";
-
-                    MySqlCommand comando = new MySqlCommand(update, conexaoBanco);
-                    comando.Parameters.AddWithValue("@senha", senhaHash);
-                    comando.Parameters.AddWithValue("@email", email);
-
-                    int resultado = comando.ExecuteNonQuery();
-
-                    if (resultado > 0)
-                    {
-                        return true;  
-                    }
-                    else
-                    {
-                        return false; 
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao redefinir a senha: " + ex.Message, "Erro - Redefinir Senha", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        //----------------------------------------------------------------------------------------------------------------------------------//
-        public bool ExisteCpfeEmail()
-        {
-            try
-            {
-                using (MySqlConnection conexaoBanco = new ConexaoBD().Conectar())
-                {
-                    string select = "SELECT COUNT(*) FROM usuarios WHERE email = @email and cpf = @cpf;";
-                    MySqlCommand comando = new MySqlCommand(select, conexaoBanco);
-                    comando.Parameters.AddWithValue("@email", Email);
-                    comando.Parameters.AddWithValue("@cpf", Cpf);
-
-                    int count = Convert.ToInt32(comando.ExecuteScalar());
-                    return count > 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erro ao verificar nome existente - Método -> " + ex.Message, "Erro - Verificar Nome", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        //-------------------------------------------------------------------------------------------------------------------------
-        public static Usuarios ObterPorLoginOuEmail(string login)
-        {
-            using (MySqlConnection conexaoBD = new ConexaoBD().Conectar())
-            {
-                string sql = "SELECT nome, cpf, email, senha as SenhaHas, usuario FROM usuarios WHERE usuario = @login OR email = @login";
-
-                using var cmd = new MySqlCommand(sql, conexaoBD);
-                cmd.Parameters.AddWithValue("@login", login);
-
-                using var reader = cmd.ExecuteReader();
-                if (!reader.Read())
-                    return null;
-
-                return new Usuarios
-                {
-                    Nome = reader.GetString("nome"),
-                    Cpf = reader.GetString("cpf"),
-                    Email = reader.GetString("email"),
-                    Senha = reader.GetString("SenhaHas"),
-                    Usuario = reader.GetString("usuario")
-                };
-            }
-        }
-        public void DefinirSenha(string senhaPura)
-        {
-            senha = BCrypt.Net.BCrypt.HashPassword(senhaPura);
-        }
-        public bool VerificarSenha(string senhaDigitada, string hashArmazenado)
-        {
-            return BCrypt.Net.BCrypt.Verify(senhaDigitada, hashArmazenado);
+            return cpf.EndsWith(digito);
         }
     }
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
-
-
-
-

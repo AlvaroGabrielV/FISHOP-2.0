@@ -18,6 +18,8 @@ namespace FISHOP
             InitializeComponent();
         }
 
+        public int EnderecoId { get; set; }
+        public int UsuarioId { get; set; }
         public string Rua
         {
             get => rua_lbl.Text;
@@ -64,24 +66,28 @@ namespace FISHOP
             endereco_radio.Checked = false;
         }
 
+
         private void deletar_btn_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Deseja realmente remover este endereço?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show(
+                    "Deseja realmente remover este endereço?",
+                    "Confirmar",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                EnderecoService.RemoverEndereco(new Endereco
+                bool ok = EnderecoService.RemoverEndereco(EnderecoId, UsuarioId);
+                if (ok)
                 {
-                    Rua = this.Rua,
-                    Numero = this.Numero,
-                    Bairro = this.Bairro,
-                    Cidade = this.Cidade,
-                    Usuario = this.Usuario
-                });
-
-                
-                var form = this.FindForm() as Carrinho;
-                form?.PopularEnderecos();
+                    var form = this.FindForm() as Carrinho;
+                    form?.PopularEnderecos();
+                }
+                else
+                {
+                    MessageBox.Show("Falha ao remover endereço.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
-
     }
+
 }
+

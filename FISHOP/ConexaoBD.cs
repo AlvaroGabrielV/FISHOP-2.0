@@ -9,7 +9,7 @@ namespace Atividade_GestaodeProdutos
 {
     class ConexaoBD
     {
-        private string conexaoBanco = "Server=localhost; Database=GestaoProdutos; Uid=root; Pwd='';";
+        private string conexaoBanco = "Server=localhost; Database=fishop; Uid=root; Pwd='';";
 
         public MySqlConnection Conectar()
         {

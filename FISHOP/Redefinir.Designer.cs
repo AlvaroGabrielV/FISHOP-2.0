@@ -198,8 +198,9 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.BackgroundImage = FISHOP.Properties.Resources.ESQUECISENHAcerto;
+            pictureBox1.BackgroundImageLayout = ImageLayout.Stretch;
             pictureBox1.Dock = DockStyle.Fill;
-            pictureBox1.Image = Properties.Resources.Senha;
             pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(831, 475);

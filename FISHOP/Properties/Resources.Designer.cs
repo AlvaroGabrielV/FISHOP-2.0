@@ -73,6 +73,26 @@ namespace FISHOP.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap CADASTROcerto {
+            get {
+                object obj = ResourceManager.GetObject("CADASTROcerto", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap CADASTROcomNumerosCertos {
+            get {
+                object obj = ResourceManager.GetObject("CADASTROcomNumerosCertos", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap close {
             get {
                 object obj = ResourceManager.GetObject("close", resourceCulture);
@@ -123,9 +143,29 @@ namespace FISHOP.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ESQUECISENHAcerto {
+            get {
+                object obj = ResourceManager.GetObject("ESQUECISENHAcerto", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap grocery_store {
             get {
                 object obj = ResourceManager.GetObject("grocery-store", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LOGINcerto {
+            get {
+                object obj = ResourceManager.GetObject("LOGINcerto", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

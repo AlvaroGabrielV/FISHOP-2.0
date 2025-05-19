@@ -40,9 +40,9 @@ namespace Atividade_GestaodeProdutos
                     return;
                 }
 
-                Usuarios usuario = new Usuarios();
+                FISHOP.Usuarios usuario = FISHOP.Usuarios.ObterPorLoginOuEmail(email);
 
-                if (usuario.RedefinirSenha(email, novaSenha))
+                if (usuario != null && usuario.RedefinirSenha(novaSenha))
                 {
                     MessageBox.Show("Senha redefinida com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LimparCampos();
@@ -59,7 +59,6 @@ namespace Atividade_GestaodeProdutos
                 }
 
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("Não foi possível redefinir senha: " + ex.Message, "Erro - Redefinir", MessageBoxButtons.OK, MessageBoxIcon.Error);

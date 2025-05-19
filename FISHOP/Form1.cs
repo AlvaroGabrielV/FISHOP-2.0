@@ -1,74 +1,74 @@
+using Atividade_GestaodeProdutos;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+
 namespace FISHOP
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        private readonly int usuarioId;
+
+        public Form1(int idUsuario)
         {
             InitializeComponent();
+            usuarioId = idUsuario;
         }
 
         private void input_btn_Click(object sender, EventArgs e)
         {
             flowProdutos.Controls.Clear();
 
-            if (!string.IsNullOrEmpty(input_txt.Text))
+            if (!string.IsNullOrWhiteSpace(input_txt.Text))
             {
-                List<Item> produtos = GeradorProduto.GerarProdutos(input_txt.Text);
+                List<Item> produtos = GeradorProduto.GerarProdutos(input_txt.Text.Trim());
 
                 if (produtos != null && produtos.Count > 0)
                 {
                     foreach (var item in produtos)
                     {
-                        ProdutoCard card = new ProdutoCard();
+                        // Cria o ProdutoCard passando o nome do usuário
+                        ProdutoCard card = new ProdutoCard(usuarioId);
                         card.SetProduto(item);
                         flowProdutos.Controls.Add(card);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Produto não encontrado");
+                    MessageBox.Show("Nenhum produto encontrado.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
 
         private void input_txt_KeyPress(object sender, KeyPressEventArgs e)
         {
-
+            // Se quiser, trate Enter para disparar pesquisa
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                input_btn_Click(this, EventArgs.Empty);
+                e.Handled = true;
+            }
         }
 
         private void close_btn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Application.Exit();
         }
 
-        private void minimize_btn_Click_1(object sender, EventArgs e)
+        private void minimize_btn_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            // Inicialização extra se necessário
         }
 
         private void carrinho_btn_Click(object sender, EventArgs e)
         {
-            Carrinho carrinho = new Carrinho();
-            carrinho.ShowDialog();
-
-
-        }
-
-        public void AtualizarQuantidadeCarrinho()
-        {
-            int total = 0;
-
-            foreach (var item in CarrinhoService.ObterProdutos())
-            {
-                total += item.Quantidade;
-            }
-
-            cart_quantity.Text = total.ToString();
+            Carrinho carrinhoForm = new Carrinho(usuarioId);
+            carrinhoForm.ShowDialog();
         }
     }
 }

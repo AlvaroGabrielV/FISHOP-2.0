@@ -8,13 +8,14 @@ namespace FISHOP
 {
     public partial class Carrinho : Form
     {
+        private readonly int usuarioId;
+        private decimal taxaEntrega = 0;
 
-        public Carrinho()
+        public Carrinho(int idUsuario)
         {
             InitializeComponent();
+            usuarioId = idUsuario;
         }
-
-        private decimal taxaEntrega = 0;
 
         private void Carrinho_Load(object sender, EventArgs e)
         {
@@ -27,17 +28,13 @@ namespace FISHOP
             this.Close();
         }
 
-
         public void AtualizarCarrinho()
         {
             flowLayoutPanel1.Controls.Clear();
-
-            var produtos = CarrinhoService.ObterProdutos();
+            List<Item> produtos = CarrinhoService.ObterProdutos(usuarioId);
 
             if (produtos.Count == 0)
             {
-
-
                 total_lbl.Text = "Total: R$ 0,00";
             }
             else
@@ -52,7 +49,8 @@ namespace FISHOP
                         Estrelas = item.Rating,
                         ImagemUrl = item.ImageUrl,
                         Produto = item,
-                        Quantidade = item.Quantidade > 0 ? item.Quantidade : 1
+                        Quantidade = item.Quantidade > 0 ? item.Quantidade : 1,
+                        UsuarioId = usuarioId
                     };
 
                     card.Dock = DockStyle.Top;
@@ -84,8 +82,7 @@ namespace FISHOP
         public void PopularEnderecos()
         {
             endereco_flow.Controls.Clear();
-
-            var enderecos = EnderecoService.ObterEnderecos();
+            List<Endereco> enderecos = EnderecoService.ObterEnderecos(usuarioId);
 
             if (enderecos.Count == 0)
             {
@@ -99,20 +96,20 @@ namespace FISHOP
                 {
                     var card = new EnderecoCard
                     {
+                        EnderecoId = e.Id,
+                        UsuarioId = usuarioId,
                         Rua = e.Rua,
                         Numero = e.Numero,
                         Bairro = e.Bairro,
                         Cidade = e.Cidade,
-                        Usuario = e.Usuario,
+                        Usuario = "",
                         Width = endereco_flow.ClientSize.Width - 25,
                         Margin = new Padding(3, 3, 3, 10)
                     };
 
                     card.EnderecoSelecionado += EnderecoSelecionadoHandler;
-
                     endereco_flow.Controls.Add(card);
                 }
-
 
                 var addEnderecoLabel = new Label()
                 {
@@ -124,12 +121,11 @@ namespace FISHOP
                     Font = new Font("Segoe UI", 10, FontStyle.Underline),
                     Dock = DockStyle.Top,
                     Height = 30,
-                    //Margin = new Padding(3, 5, 3, 5)
                 };
 
                 addEnderecoLabel.Click += (s, e) =>
                 {
-                    var cadastro = new EnderecoCadastro(this);
+                    var cadastro = new EnderecoCadastro(usuarioId, this);
                     cadastro.ShowDialog();
                 };
 
@@ -139,7 +135,6 @@ namespace FISHOP
 
         private void EnderecoSelecionadoHandler(object sender, EventArgs e)
         {
-
             foreach (var control in endereco_flow.Controls)
             {
                 if (control is EnderecoCard card && card != sender)
@@ -148,21 +143,19 @@ namespace FISHOP
                 }
             }
 
-
             Random rnd = new Random();
-            taxaEntrega = rnd.Next(5, 26); // de 5 a 25
-
+            taxaEntrega = rnd.Next(5, 26);
 
             taxa_lbl.Text = "Taxa de entrega: R$ " + taxaEntrega.ToString("F2").Replace('.', ',');
 
             AtualizarTotal();
         }
 
-
         private void cadastro_endereco_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            EnderecoCadastro cadastro = new EnderecoCadastro(this);
+            var cadastro = new EnderecoCadastro(usuarioId, this);
             cadastro.ShowDialog();
         }
     }
 }
+

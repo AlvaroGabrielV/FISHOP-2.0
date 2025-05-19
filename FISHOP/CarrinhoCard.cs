@@ -7,14 +7,14 @@ namespace FISHOP
 {
     public partial class CarrinhoCard : UserControl
     {
+        // Em vez de CarrinhoItem, use Item diretamente
         public Item Produto { get; set; }
+        public int UsuarioId { get; set; } // Precisamos saber qual usuário faz a operação
 
         public CarrinhoCard()
         {
             InitializeComponent();
-
         }
-
 
         public int Quantidade
         {
@@ -39,7 +39,10 @@ namespace FISHOP
             {
                 Produto.Quantidade = Quantidade;
 
-                
+                // Atualiza no banco de dados
+                CarrinhoService.AtualizarQuantidade(UsuarioId, Produto.Position, Quantidade);
+
+                // Recalcula total na interface
                 var formCarrinho = this.FindForm() as Carrinho;
                 formCarrinho?.AtualizarTotal();
             }
@@ -47,11 +50,16 @@ namespace FISHOP
 
         private void remover_btn_Click(object sender, EventArgs e)
         {
-            CarrinhoService.RemoverProduto(Produto);
-            var formCarrinho = this.FindForm() as Carrinho;
-            formCarrinho?.AtualizarCarrinho();
+            if (Produto != null)
+            {
+                // Remove do banco
+                CarrinhoService.RemoverProduto(UsuarioId, Produto.Position);
+
+                // Atualiza interface
+                var formCarrinho = this.FindForm() as Carrinho;
+                formCarrinho?.AtualizarCarrinho();
+            }
         }
-        
 
         public string Titulo
         {
