@@ -73,11 +73,13 @@
             txtSenhaUsuario.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
             txtSenhaUsuario.Location = new Point(539, 323);
             txtSenhaUsuario.Name = "txtSenhaUsuario";
+            txtSenhaUsuario.PasswordChar = '*';
             txtSenhaUsuario.PlaceholderText = "";
             txtSenhaUsuario.SelectedText = "";
             txtSenhaUsuario.ShadowDecoration.CustomizableEdges = customizableEdges2;
             txtSenhaUsuario.Size = new Size(169, 19);
             txtSenhaUsuario.TabIndex = 45;
+            txtSenhaUsuario.UseSystemPasswordChar = true;
             // 
             // TxtUserUsuario
             // 

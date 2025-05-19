@@ -67,11 +67,13 @@
             txtConfirmarSenha.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
             txtConfirmarSenha.Location = new Point(559, 269);
             txtConfirmarSenha.Name = "txtConfirmarSenha";
+            txtConfirmarSenha.PasswordChar = '*';
             txtConfirmarSenha.PlaceholderText = "";
             txtConfirmarSenha.SelectedText = "";
             txtConfirmarSenha.ShadowDecoration.CustomizableEdges = customizableEdges2;
             txtConfirmarSenha.Size = new Size(169, 19);
             txtConfirmarSenha.TabIndex = 54;
+            txtConfirmarSenha.UseSystemPasswordChar = true;
             // 
             // txtSenhaNova
             // 
@@ -89,11 +91,13 @@
             txtSenhaNova.HoverState.BorderColor = Color.FromArgb(94, 148, 255);
             txtSenhaNova.Location = new Point(559, 221);
             txtSenhaNova.Name = "txtSenhaNova";
+            txtSenhaNova.PasswordChar = '*';
             txtSenhaNova.PlaceholderText = "";
             txtSenhaNova.SelectedText = "";
             txtSenhaNova.ShadowDecoration.CustomizableEdges = customizableEdges4;
             txtSenhaNova.Size = new Size(169, 19);
             txtSenhaNova.TabIndex = 53;
+            txtSenhaNova.UseSystemPasswordChar = true;
             // 
             // TxtEmailRedefinir
             // 

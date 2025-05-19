@@ -38,5 +38,10 @@ namespace FISHOP
                 MessageBox.Show("Falha ao salvar endereço.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void return_btn_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

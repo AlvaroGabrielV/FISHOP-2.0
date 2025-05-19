@@ -91,7 +91,7 @@
             // cidade_lbl
             // 
             cidade_lbl.BackColor = Color.Transparent;
-            cidade_lbl.Location = new Point(104, 58);
+            cidade_lbl.Location = new Point(130, 58);
             cidade_lbl.Name = "cidade_lbl";
             cidade_lbl.Size = new Size(38, 17);
             cidade_lbl.TabIndex = 2;
